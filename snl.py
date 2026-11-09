@@ -63,12 +63,26 @@ class Game:
             raise ValueError("No players given")
 
         self._current_player = self._players[0]
+        self._winner: Player | None = None
+
+    @property
+    def winner(self) -> Player | None:
+        return self._winner
 
     def _move_current_player(self, roll: int):
         new_position: int = self._current_player.position + roll
+        if new_position > self._board.size:
+            print(f"Overshoot! {new_position}")
+            new_position = self._board.size - (new_position - self._board.size)
         self._current_player.position = new_position
 
+    def _check_win_condition(self) -> bool:
+        return self._current_player.position == self._board.size
+
     def take_turn(self):
+        if self.winner is not None:
+            print(f"The game has already been won by {self.winner.name}")
+            return
         print(f"Player: {self._current_player.name}'s go!")
         print(f"Start position: {self._current_player.position}")
         roll = self._dice.roll()
@@ -76,6 +90,15 @@ class Game:
         self._move_current_player(roll)
         print(f"Finish position: {self._current_player.position}")
         print()
+        if self._check_win_condition():
+            self._winner = self._current_player
+
+    def play(self) -> Player:
+        print("Game start!")
+        print("-----------")
+        while self._winner is None:
+            self.take_turn()
+        return self._winner
 
 
 def main() -> int:
@@ -89,11 +112,9 @@ def main() -> int:
     players = [player1, player2]
 
     game = Game(board, players, dice)
+    winning_player = game.play()
 
-    print("Game start!")
-    print("-----------")
-    for _ in range(5):
-        game.take_turn()
+    print(f"And the winner is: {winning_player.name}")
 
     return 0
 
