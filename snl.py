@@ -26,9 +26,75 @@
 # This is not intended to be a task that deals with complex UI or design, it is more the core engine and logic that’s important. We are leaving the implementation design completely up to you on how you approach the problem. 
 
 import sys
+import random
+
+BOARD_SIZE = 100
+BOARD_START = 1
+DICE_SIDES = 6
+
+class Player:
+
+    def __init__(self, name: str):
+        self.name: str = name
+        self.position: int = BOARD_START
+
+class Board:
+
+    def __init__(self, size: int):
+        self.size: int = size
+
+class Dice:
+
+    def __init__(self, sides: int):
+        self._sides: int = sides
+
+    def roll(self) -> int:
+        return random.randint(1, self._sides)
+
+
+class Game:
+
+    def __init__(self, board: Board, players: list[Player], dice: Dice):
+        self._board = board
+        self._players = players
+        self._dice = dice
+
+        if not players:
+            raise ValueError("No players given")
+
+        self._current_player = self._players[0]
+
+    def _move_current_player(self, roll: int):
+        new_position: int = self._current_player.position + roll
+        self._current_player.position = new_position
+
+    def take_turn(self):
+        print(f"Player: {self._current_player.name}'s go!")
+        print(f"Start position: {self._current_player.position}")
+        roll = self._dice.roll()
+        print(f"Rolled: {roll}")
+        self._move_current_player(roll)
+        print(f"Finish position: {self._current_player.position}")
+        print()
 
 
 def main() -> int:
+
+    board = Board(BOARD_SIZE)
+
+    dice = Dice(DICE_SIDES)
+
+    player1 = Player("Player1")
+    player2 = Player("Player2")
+    players = [player1, player2]
+
+    game = Game(board, players, dice)
+
+    print("Game start!")
+    print("-----------")
+    for _ in range(5):
+        game.take_turn()
+
     return 0
 
 if __name__ == "__main__":
