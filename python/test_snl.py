@@ -11,7 +11,7 @@ from time import perf_counter
 
 import pytest
 
-from snl import Board, Dice, Game, Player
+from python.snl import Board, Dice, Game, Player
 
 
 class FixedDice:

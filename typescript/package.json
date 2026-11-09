@@ -1,0 +1,21 @@
+{
+  "name": "snakes-and-ladders",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.2"
+  },
+  "scripts": {
+    "start": "node snl.ts",
+    "test": "node --test snl.test.ts",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "25.9.9",
+    "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "random": "5.5.1"
+  }
+}
