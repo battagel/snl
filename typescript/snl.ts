@@ -61,9 +61,34 @@ export class Player {
 
 export class Board {
     size: number;
+    private _obsticles: Record<number, number>;
 
-    constructor(size: number) {
+    /**
+     * Divergences:
+     * - `dict[int, int]` becomes `Record<number, number>`, so boards use the same literal syntax as
+     *   Python (`{17: 4}`). JavaScript stores object keys as strings, but indexing with a number
+     *   converts it automatically, so lookups behave the same.
+     * - `snakes or {}` becomes `snakes ?? {}`. `??` only replaces null/undefined, but an empty
+     *   object gives the same result, so the behaviour matches.
+     * - `{**snakes, **ladders}` becomes `{ ...snakes, ...ladders }`; later keys still win.
+     * - Like the Python, `snakes` and `ladders` have no default, so `new Board(100)` is a compile
+     *   error under `tsc`. In Python the same call fails at runtime with a TypeError. Under
+     *   `node`, which strips types without checking them, it runs and `?? {}` covers the missing
+     *   arguments.
+     */
+    constructor(size: number, snakes: Record<number, number> | null, ladders: Record<number, number> | null) {
+        // Assume that:
+        // a) The obsticle start and end are within the board
+        // b) No obsticle start or end are on the same tile
         this.size = size;
+        snakes = snakes ?? {};
+        ladders = ladders ?? {};
+        this._obsticles = { ...snakes, ...ladders };
+    }
+
+    /** Divergence: `dict.get(key, default)` becomes an index lookup with `??` as the default. */
+    checkObsticles(position: number): number {
+        return this._obsticles[position] ?? position;
     }
 }
 
@@ -130,6 +155,7 @@ export class Game {
             console.log(`Overshoot! ${newPosition}`);
             newPosition = this._board.size - (newPosition - this._board.size);
         }
+        newPosition = this._board.checkObsticles(newPosition);
         this._currentPlayer.position = newPosition;
     }
 
@@ -174,7 +200,11 @@ export class Game {
  */
 export function main(): number {
 
-    const board = new Board(BOARD_SIZE);
+    const snakes = { 17: 4 };
+
+    const ladders = { 5: 30 };
+
+    const board = new Board(BOARD_SIZE, snakes, ladders);
 
     const dice = new Dice(DICE_SIDES);
 

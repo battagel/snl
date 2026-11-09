@@ -40,8 +40,17 @@ class Player:
 
 class Board:
 
-    def __init__(self, size: int):
+    def __init__(self, size: int, snakes: dict[int, int] | None, ladders: dict[int, int] | None):
+        # Assume that:
+        # a) The obsticle start and end are within the board
+        # b) No obsticle start or end are on the same tile
         self.size: int = size
+        snakes = snakes or {}
+        ladders = ladders or {}
+        self._obsticles: dict[int, int] = {**snakes, **ladders}
+
+    def check_obsticles(self, position: int) -> int:
+        return self._obsticles.get(position, position)
 
 class Dice:
 
@@ -79,6 +88,7 @@ class Game:
         if new_position > self._board.size:
             print(f"Overshoot! {new_position}")
             new_position = self._board.size - (new_position - self._board.size)
+        new_position = self._board.check_obsticles(new_position)
         self._current_player.position = new_position
 
     def _check_win_condition(self) -> bool:
@@ -110,7 +120,11 @@ class Game:
 
 def main() -> int:
 
-    board = Board(BOARD_SIZE)
+    snakes = {17: 4}
+
+    ladders = {5: 30}
+
+    board = Board(BOARD_SIZE, snakes, ladders)
 
     dice = Dice(DICE_SIDES)
 

@@ -1,5 +1,7 @@
 # Snakes and Ladders
 
+> Note: This was done for the Hargreaves Lansdown interview
+
 The core engine for a Snakes and Ladders game: players, board, dice, turns and winning. It has no UI.
 
 It was written first in **Python**, then **transpiled into TypeScript using AI**. The TypeScript follows the Python as closely as possible, and its docstrings note where it differs.
