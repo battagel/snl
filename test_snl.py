@@ -4,9 +4,14 @@
 # pylint: disable=protected-access,redefined-outer-name
 # pyright: reportPrivateUsage=false
 
+import contextlib
+import os
+from collections import Counter
+from time import perf_counter
+
 import pytest
 
-from snl import Board, Game, Player
+from snl import Board, Dice, Game, Player
 
 
 class FixedDice:
@@ -147,3 +152,21 @@ def test_3_3_players_track_positions_independently(make_game, player1, player2):
     assert player1.position == 4
     assert player2.position == 6
 
+
+
+def test_performance(capsys):
+    games = 100_000
+    start = perf_counter()
+    winner_counts = Counter()
+    with open(os.devnull, "w", encoding="utf-8") as devnull, contextlib.redirect_stdout(devnull):
+        for _ in range(games):
+            game = Game(Board(100), [Player("Player1"), Player("Player2")], Dice(6))
+            winner = game.play()
+            winner_counts[winner.name] += 1
+
+    with capsys.disabled():
+        print(f"\n{winner_counts}")
+        print(f"{perf_counter() - start:.2f}s")
+
+    assert sum(winner_counts.values()) == games
+    assert set(winner_counts) == {"Player1", "Player2"}

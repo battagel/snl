@@ -69,6 +69,11 @@ class Game:
     def winner(self) -> Player | None:
         return self._winner
 
+    def _next_player(self):
+        current_index = self._players.index(self._current_player)
+        next_index = (current_index + 1) % len(self._players)
+        self._current_player = self._players[next_index]
+
     def _move_current_player(self, roll: int):
         new_position: int = self._current_player.position + roll
         if new_position > self._board.size:
@@ -92,6 +97,8 @@ class Game:
         print()
         if self._check_win_condition():
             self._winner = self._current_player
+            return
+        self._next_player()
 
     def play(self) -> Player:
         print("Game start!")
@@ -110,6 +117,7 @@ def main() -> int:
     player1 = Player("Player1")
     player2 = Player("Player2")
     players = [player1, player2]
+    random.shuffle(players) # Avoid player1s advantage
 
     game = Game(board, players, dice)
     winning_player = game.play()
